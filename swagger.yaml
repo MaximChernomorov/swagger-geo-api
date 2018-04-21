@@ -1,0 +1,799 @@
+swagger: '2.0'
+info:
+  title: Geo API
+  description: Google Maps geo api
+  version: "1.0.0"
+# the domain of the service
+host: example-domain.com
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /v1
+consumes:
+  - application/form-data
+produces:
+  - application/json
+securityDefinitions:
+  authKey: {
+    type: apiKey,
+    name: api-key,
+    in: header
+  }
+security: [
+    authKey: []
+  ]
+paths:
+  /geocode/google:
+    post:
+      operationId: geocode
+      summary: Geocoding method
+      description: |
+        Returns address components, formatted address, geometry, place_id and types via google maps api.
+        https://developers.google.com/maps/documentation/geocoding/intro?hl=en
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: query
+          in: formData
+          description: Address to geocode.
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A geocoding response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/GeoResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /reverse/google:
+    post:
+      operationId: reverse
+      summary: Reverse geocoding method
+      description: |
+        Translating a location on the map into a human-readable address
+        https://developers.google.com/maps/documentation/geocoding/intro?hl=en
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: placeid
+          in: formData
+          description: Google place_id to reverse-geocode.
+          required: false
+          type: string
+        - name: coordinates
+          in: formData
+          description: Coordinates to reverse-geocode
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A geocoding response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/GeoResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /autocomplete/google:
+    post:
+      operationId: autocompleteGoogle
+      summary: Address autocomplete
+      description: |
+        Address autocomplete by google
+        https://developers.google.com/places/web-service/autocomplete?hl=ru
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: query
+          in: formData
+          description: Input address to complete
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A autocomplete response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/AutocompleteResponseGoogle'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /autocomplete/simple:
+    post:
+      operationId: autocompleteSimple
+      summary: Address autocomplete
+      description: |
+        Address autocomplete by google
+        https://developers.google.com/places/web-service/autocomplete?hl=ru
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: query
+          in: formData
+          description: Input address to complete
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A autocomplete response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                type: array
+                items:
+                  $ref: '#/definitions/AutocompleteResponseSimple'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /place/google:
+    post:
+      operationId: placeGoogle
+      summary: Place details
+      description: |
+        Once you have a place_id or a reference from a Place Search, you can request more details about a particular establishment or point of interest by initiating a Place Details request. A Place Details request returns more comprehensive information about the indicated place such as its complete address, phone number, user rating and reviews.
+        https://maps.googleapis.com/maps/api/place/details/output?parameters
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: placeid
+          in: formData
+          description: Google place_id
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A autocomplete response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/PlaceOriginalResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /place/array:
+    post:
+      operationId: placeArray
+      summary: Place details
+      description: |
+        Once you have a place_id or a reference from a Place Search, you can request more details about a particular establishment or point of interest by initiating a Place Details request. A Place Details request returns more comprehensive information about the indicated place such as its complete address, phone number, user rating and reviews.
+        https://maps.googleapis.com/maps/api/place/details/output?parameters
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: placeid
+          in: formData
+          description: Google place_id
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: A autocomplete response object
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/PlaceOptimizedResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /addressComplete/google:
+    post:
+      operationId: addressComplete
+      summary: Address autocomplete with details in result
+      description: |
+        Address autocomplete with details in result on zoom 17
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: query
+          in: formData
+          description: Input address to complete
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: options
+          in: formData
+          description: Options.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: Returns list of suggested optimized results of place object.
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                type: array
+                items:
+                  $ref: '#/definitions/AddressCompleteResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /addressCompleteByPlaceId/google:
+    post:
+      operationId: addressCompleteByPlaceId
+      summary: Address autocomplete with details in result by google place_id
+      description: |
+        Address autocomplete with details in result on zoom 17
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: placeid
+          in: formData
+          description: Google place_id
+          required: true
+          type: string
+        - name: query
+          in: formData
+          description: Query for /complete.
+          required: true
+          type: string
+        - name: provider
+          in: formData
+          required: true
+          type: string
+        - name: type
+          in: formData
+          description: Direction in results.
+          required: false
+          type: string
+      tags:
+        - google
+      responses:
+        200:
+          description: Returns list of suggested optimized results of place object.
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              code:
+                type: integer
+              result:
+                $ref: '#/definitions/AddressCompleteByPlaceIdResponse'
+              error_message:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  AspectType:
+    type: string
+    enum: [
+      appeal,
+      atmosphere,
+      decor,
+      facilities,
+      food,
+      overall,
+      quality,
+      service
+      ]
+  Scope:
+      type: string
+      enum: [
+        "GOOGLE",
+        "APP"
+        ]
+      description: |
+        Indicates the scope of the place_id. The possible values are:
+        APP: The place ID is recognised by your application only. This is because your application added the place, and the place has not yet passed the moderation process.
+        GOOGLE: The place ID is available to other applications and on Google Maps.
+  Status:
+    type: string
+    enum: [
+        "OK",
+        "ZERO_RESULTS",
+        "OVER_QUERY_LIMIT",
+        "REQUEST_DENIED",
+        "UNKNOWN_ERROR"
+    ]
+    description: |
+      "OK" indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned.
+      "ZERO_RESULTS" indicates that the geocode was successful but returned no results. This may occur if the geocoder was passed a non-existent address.
+      "OVER_QUERY_LIMIT" indicates that you are over your quota.
+      "REQUEST_DENIED" indicates that your request was denied.
+      "INVALID_REQUEST" generally indicates that the query (address, components or latlng) is missing.
+      "UNKNOWN_ERROR" indicates that the request could not be processed due to a server error. The request may succeed if you try again.
+  AddressCompleteByPlaceIdResponse:
+    type: object
+    properties:
+      success:
+        type: string
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            lat:
+              type: string
+            lng:
+              type: string
+            place_id:
+              type: string
+            full_address:
+              type: string
+            phone:
+              type: string
+            components:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  short_name:
+                    type: string
+                  long_name:
+                    type: string
+            locality:
+              $ref: '#/definitions/Country'
+            full_address_reverse:
+              type: string
+            zoom:
+              type: integer
+            type:
+              type: string
+            direction:
+              type: string
+            route:
+              type: object
+              properties:
+                short_name:
+                  type: string
+                long_name:
+                  type: string
+  AddressCompleteResponse:
+    type: object
+    properties:
+      name:
+        type: string
+      lat:
+        type: string
+      lng:
+        type: string
+      place_id:
+        type: string
+      full_address:
+        type: string
+      phone:
+        type: string
+      components:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            short_name:
+              type: string
+            long_name:
+              type: string
+      locality:
+        $ref: '#/definitions/Country'
+      full_address_reverse:
+        type: string
+      zoom:
+        type: integer
+      type:
+        type: string
+      direction:
+        type: string
+  AutocompleteResponseSimple:
+    type: object
+    properties:
+      name:
+        type: string
+      place_id:
+        type: string
+      parents:
+        type: array
+        items:
+          type: object
+          properties:
+            offset:
+              type: string
+            value:
+              type: string
+  GeoResponse:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/Status'
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/GeoResult'
+  AutocompleteResponseGoogle:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/Status'
+      predictions:
+        type: array
+        items:
+          $ref: '#/definitions/Prediction'
+  PlaceOptimizedResponse:
+    type: object
+    properties:
+      name:
+        type: string
+      lat:
+        type: string
+      lng:
+        type: string
+      place_id:
+        type: string
+      full_address:
+        type: string
+      phone:
+        type: string
+      components:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            short_name:
+              type: string
+            long_name:
+              type: string
+      locality:
+        $ref: '#/definitions/Country'
+      full_address_reverse:
+        type: string
+  PlaceOriginalResponse:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/Status'
+      html_attributions:
+        type: array
+        items:
+          type: string
+      result:
+        type: object
+        properties:
+          address_components:
+            type: array
+            items:
+              $ref: '#/definitions/AddressComponent'
+          geometry:
+            $ref: '#/definitions/Geometry'
+          adr_address:
+            type: string
+            description: Representation of the place's address in the adr microformat http://microformats.org/wiki/adr.
+          formatted_address:
+            type: string
+          formatted_phone_number:
+            type: string
+            description: contains the place's phone number in its local format.
+          icon:
+            type: string
+          id:
+            type: string
+          international_phone_number:
+            type: string
+            description: contains the place's phone number in international format.
+          name:
+            type: string
+          place_id:
+            type: string
+          scope:
+            $ref: '#/definitions/Scope'
+          alt_ids:
+            type: object
+            properties:
+              place_id:
+                type: string
+              scope:
+                $ref: '#/definitions/Scope'
+          rating:
+            type: number
+            format: float
+          reference:
+            type: string
+          reviews:
+            type: array
+            items:
+              $ref: '#/definitions/Review'
+          types:
+            type: array
+            items:
+              type: string
+          url:
+            type: string
+            description: Contains the URL of the official Google page for this place.
+          vicinity:
+            type: string
+            description: Lists a simplified address for the place, including the street name, street number, and locality, but not the province/state, postal code, or country.
+          website:
+            type: string
+            description: Lists the authoritative website for this place, such as a business' homepage.
+  Prediction:
+    type: object
+    properties:
+      description:
+        type: string
+        description: Contains the human-readable name for the returned result. For establishment results, this is usually the business name.
+      id:
+        type: string
+      matched_substrings:
+        type: array
+        items:
+          $ref: '#/definitions/StringLocation'
+        description: These describe the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
+      place_id:
+        type: string
+      reference:
+        type: string
+      terms:
+        type: array
+        items:
+          $ref: '#/definitions/StringLocation'
+        description: Contains an array of terms identifying each section of the returned description (a section of the description is generally terminated with a comma). Each entry in the array has a value field, containing the text of the term, and an offset field, defining the start position of this term in the description, measured in Unicode characters.
+      types:
+        type: array
+        items:
+          type: string
+  StringLocation:
+    type: object
+    properties:
+      offset:
+        type: integer
+      length:
+        type: integer
+  GeoResult:
+    type: object
+    properties:
+      formatted_address:
+        type: string
+      place_id:
+        type: string
+      types:
+        type: array
+        items:
+          type: string
+      address_components:
+        type: array
+        items:
+          $ref: '#/definitions/AddressComponent'
+      geometry:
+          $ref: '#/definitions/Geometry'
+  AddressComponent:
+    type: object
+    properties:
+      long_name:
+        type: string
+        description: Full text description or name of the address component as returned by the Geocoder.
+      short_name:
+        type: string
+        description: An abbreviated textual name for the address component, if available. For example, an address component for the state of Alaska may have a long_name of "Alaska" and a short_name of "AK" using the 2-letter postal abbreviation.
+      types:
+        type: array
+        items:
+          type: string
+  Review:
+    type: object
+    properties:
+      aspects:
+        type: array
+        items:
+          $ref: '#/definitions/Aspect'
+      author_name:
+        type: string
+        description: The name of the user who submitted the review. Anonymous reviews are attributed to "A Google user".
+      author_url:
+        type: string
+        description: The URL to the users Google+ profile, if available.
+      language:
+        type: string
+        description: IETF language code indicating the language used in the user's review. This field contains the main language tag only, and not the secondary tag indicating country or region.
+      rating:
+        type: number
+        format: float
+      text:
+        type: string
+      time:
+        type: integer
+        format: int64
+  Aspect:
+    type: object
+    properties:
+      rating:
+        type: number
+        format: float
+      type:
+        $ref: '#/definitions/AspectType'
+    description: Provides a rating of a single attribute of the establishment. The first object in the collection is considered the primary aspect.
+  Geometry:
+    type: object
+    properties:
+      location:
+        $ref: '#/definitions/Location'
+      location_type:
+        type: string
+        enum: [
+            "ROOFTOP",
+            "RANGE_INTERPOLATED",
+            "GEOMETRIC_CENTER",
+            "APPROXIMATE"
+          ]
+        description: |
+          "ROOFTOP" indicates that the returned result is a precise geocode for which we have location information accurate down to street address precision.
+          "RANGE_INTERPOLATED" indicates that the returned result reflects an approximation (usually on a road) interpolated between two precise points (such as intersections). Interpolated results are generally returned when rooftop geocodes are unavailable for a street address.
+          "GEOMETRIC_CENTER" indicates that the returned result is the geometric center of a result such as a polyline (for example, a street) or polygon (region).
+          "APPROXIMATE" indicates that the returned result is approximate.
+      viewport:
+        type: object
+        description: |
+          In a geocoding request, you can instruct the Geocoding service to prefer results within a given viewport (expressed as a bounding box). You do so within the request URL by setting the bounds parameter. Note that biasing only prefers results within the bounds; if more relevant results exist outside of these bounds, they may be included.
+
+          The bounds parameter defines the latitude/longitude coordinates of the southwest and northeast corners of this bounding box using a pipe (|) character to separate the coordinates.
+        properties:
+          northeast:
+            $ref: '#/definitions/Location'
+          southwest:
+            $ref: '#/definitions/Location'
+  Location:
+    type: object
+    properties:
+      lat:
+        type: string
+      lng:
+        type: string
+  Country:
+    type: object
+    properties:
+      short_name:
+        type: string
+      long_name:
+        type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
